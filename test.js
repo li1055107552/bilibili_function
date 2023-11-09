@@ -51,8 +51,8 @@ async function test(){
 
     let info = new Info(__dirname)
     
-    let isrefresh = await RefreshImpl.checkrefresh(info.getAllCookie())
-    console.log(isrefresh);
+    let check = await RefreshImpl.checkrefresh(info.getAllCookie())
+    console.log(isrefresh = check.data.refresh);
 
     console.log('finish')
 }

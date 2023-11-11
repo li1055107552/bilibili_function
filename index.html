@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Bilibili短链生成器</title>
+  <meta name="keywords" content="b23.tv,b23tv,哔哩哔哩,哔哩哔哩短链,短链接, bilibili, 短链生成,b站短链,b站怎么生产那个btv23短链接？">
+  <meta name="description" content="生成b23.tv格式的短链，b站怎么生产那个btv23短链接">
+  <link href="https://cdn.staticfile.org" rel="dns-prefetch">
+  <link href="https://fonts.googleapis.com" rel="dns-prefetch">
+  <link href="https://fonts.gstatic.com" rel="dns-prefetch">
+  <script async src="https://hm.baidu.com/hm.js?308d8313ec16f721670ef77465d6aff6"></script>
+  <meta name="baidu-site-verification" content="Qqye5KEMN9">
+  <script src="https://cdn.staticfile.org/vue/2.7.0/vue.min.js"></script>
+  <link rel="icon" href="./favicon.png">
+  <link rel="stylesheet" href="https://zhibi-common.oss-cn-shanghai.aliyuncs.com/npm/paper.min.css">
+  <link rel="stylesheet" href="./index.css?v=223">
+  <link href="https://cdn.staticfile.org/toastify-js/1.12.0/toastify.min.css" rel="stylesheet">
+  <script async src="https://cdn.staticfile.org/toastify-js/1.12.0/toastify.min.js"></script>
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?52e5fee624f90ccf317fd39c74b2eadc";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+</head>
+<body>
+<div id="app">
+  <h4 class="title">哔哩哔哩短链生成器</h4>
+
+  <div class="follow" hidden>
+    <!--    <div class="">不知道为啥，我自己做的介绍视频反而被举报下家</div>-->
+    <a href="https://space.bilibili.com/7560113" class="link">好用的话，还请关注我B站</a>
+  </div>
+  <div hidden class="ad">
+    已开放全部类型的链接生成短链，欢迎使用。
+    高能建站链接联系UP。
+  </div>
+
+  <div class="form">
+    <div class="origin-url-input">
+      <input id="origin_url" type="url" name="origin_url" v-model="inputUrl" @input="inputUrlChange" :placeholder="defaultValue">
+      <svg class="close-icon" v-show="closeIconVisible" @click="clearInput" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--mdi" width="32" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41z" fill="currentColor"></path></svg>
+    </div>
+    <div class="submit-btn" id="submit" @click="handleSubmit">生成短链</div>
+
+    <div class="warn-tips"></div>
+    <!--    <iframe class="submit-btn" src="//player.bilibili.com/player.html?aid=295402185&bvid=BV1EF411q7GQ&cid=478508728&page=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>-->
+    <div class="short-url">
+      <div class="short-url-title">短链接</div>
+      <div v-show="!hasValue" class="short-url-item bg-gray"></div>
+      <div v-show="hasValue">
+        <div v-for="item in list" :key="item" class="short-url-item">
+          <a id="short-url-value" rel="noreferrer" :href="item.url" target="_blank">
+            <div class="short-url-value">{{item.url}}</div>
+            <svg class="outbound-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+              <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path>
+              <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon>
+            </svg>
+          </a>
+          <div class="copy" @click="copy(item.url)">
+            复制
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div hidden class="buy-me-coffee">
+    <div class="buy-me-coffee-header">
+      <div class="short-url-title">好用，扫码看视频两分钟一起瓜分<span class="money">98</span>元</div>
+    </div>
+    <div class="">
+      <img referrerpolicy="no-referrer" src="https://article.biliimg.com/bfs/article/ba8c1f7cad481218c76f94319c8edcf729b061e8.png" alt="">
+    </div>
+    <div class="buy-me-coffee-tips" @click="toKSDownload">
+      <div class="mt-2">截图保存上方二维码，点击此处下载快手极速版 ，按下面步骤扫码，加我微信平分红包</div>
+      <img referrerpolicy="no-referrer" src="https://article.biliimg.com/bfs/article/66353a12389f745a009fb7e99cd745e16ab379c3.jpg" alt="">
+      <img referrerpolicy="no-referrer" src="https://article.biliimg.com/bfs/article/8fe71bc9cde87394431b176e21748c31bfa15812.jpg" alt="">
+    </div>
+    <div class="download-img">
+      <img class="" src="https://zhibi-common.oss-cn-shanghai.aliyuncs.com/wx.jpeg"/>
+      <div class="img-tips">点击保存</div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    作者微信：appl532978
+  </div>
+  <div class="loading" v-show="loadingVisible">
+    <div class="mask"></div>
+    <div class="pacman"><div></div><div></div><div></div><div></div><div></div></div>
+  </div>
+  <a download="wx.jpeg" href="https://zhibi-common.oss-cn-shanghai.aliyuncs.com/wx.jpeg" class="hidden" id="download"></a>
+  <div class="dialog hidden" v-if="recommendVisible">
+    <div class="dialog-overlay" @click="overlayClick"></div>
+    <div class="dialog-content">
+      <div class="dialog-main">
+        <div class="recommend">【图片短链】<b>强烈推荐</b>使用我的<a href="https://github.com/xlzy520/bilibili-img-uploader" target="_blank">另一个项目
+          <svg class="outbound-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+            <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path>
+            <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon>
+          </svg>
+        </a>，可以直接上传图片生成短链(不能上GitHub请<a target="_blank" href="https://gitee.com/xlzy520/bilibili-img-uploader">点这里</a>)
+          <div class="recommend-btn" @click="noRecommend">不再提示</div>
+        </div>
+        <img height="400" src="https://lc.xlzy520.cn/srgIr7G5kzrTBfpUPYUSbYEBRbQHN7hb/a841a115dff5f4141c2d44650ea44c2ac259ab64.png" alt="">
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const isDev = location.hostname === 'localhost';
+  const baseUrl = isDev ? 'http://localhost:5000/' : 'https://service-ijd4slqi-1253419200.gz.apigw.tencentcs.com/release/';
+
+  new Vue({
+    el: '#app',
+    data: {
+      inputUrl: '',
+      closeIconVisible: false,
+      recommendVisible: false,
+      defaultValue: 'https://www.bilibili.com/bangumi/play/ss28747',
+      baseUrl: baseUrl + 'short_url?url=',
+      loadingVisible: false,
+      limit: 1,
+      list: [],
+    },
+    computed: {
+      hasValue() {
+        return this.list.length > 0
+      }
+    },
+    methods: {
+      noRecommend() {
+        this.recommendVisible = false
+        localStorage.setItem('noRecommend', 'true')
+      },
+      inputUrlChange(evt) {
+        const value = evt.target.value
+        this.toggleCloseIcon(value)
+      },
+      clearInput() {
+        this.inputUrl = ''
+        this.closeIconVisible = false;
+      },
+      toggleCloseIcon(value) {
+        this.closeIconVisible = !!value;
+      },
+      toggleLoading(show) {
+        this.loadingVisible = !!show;
+      },
+      copyText(text) {
+        return navigator.clipboard.writeText(text)
+      },
+      copyTextToClipboard(input) {
+        var el = document.createElement('textarea');
+
+        el.value = input;
+
+        // Prevent keyboard from showing on mobile
+        el.setAttribute('readonly', '');
+
+        el.style.contain = 'strict';
+        el.style.position = 'absolute';
+        el.style.left = '-9999px';
+        el.style.fontSize = '12pt'; // Prevent zooming on iOS
+
+        var selection = getSelection();
+        var originalRange = false;
+        if (selection.rangeCount > 0) {
+          originalRange = selection.getRangeAt(0);
+        }
+
+        document.body.appendChild(el);
+        el.select();
+
+        // Explicit selection workaround for iOS
+        el.selectionStart = 0;
+        el.selectionEnd = input.length;
+
+        var success = false;
+        try {
+          success = document.execCommand('copy');
+        } catch (err) {}
+
+        document.body.removeChild(el);
+
+        if (originalRange) {
+          selection.removeAllRanges();
+          selection.addRange(originalRange);
+        }
+
+        return success;
+      },
+      copy(url) {
+        this.copyTextToClipboard(url)
+        Toastify({
+          text: "复制成功",
+          position: "center",
+          backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+          duration: 2000
+        }).showToast();
+      },
+      downloadImg() {
+        const isMobile = navigator.userAgent.includes('Mobile')
+        const link = document.querySelector('#download')
+        const originUrl = 'https://cdn.jsdelivr.net/gh/xlzy520/bili-short-url/wx.jpeg'
+        if (isMobile) {
+          link.href = originUrl
+          link.click()
+          return
+        }
+        fetch(originUrl).then(res => res.blob()).then(res => {
+          const url = URL.createObjectURL(res)
+          link.href = url
+          link.click()
+        })
+      },
+      handleSubmit() {
+        let value = this.inputUrl ? this.inputUrl : this.defaultValue
+        if (!value.startsWith('http')) {
+          Toastify({
+            text: '请输入http或https链接，如：' + this.defaultValue,
+            position: "center",
+            backgroundColor: "linear-gradient(to right, #ff8177 0%, #ff867a 0%, #ff8c7f 21%, #f99185 52%, #cf556c 78%, #b12a5b 100%)",
+            duration: 2000
+          }).showToast();
+          return
+        }
+        const url = this.baseUrl + encodeURIComponent(value) + '&href=' + location.href
+        this.toggleLoading(true)
+        fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'referer': document.referrer
+          }
+        }).then(res => res.json()).then(res => {
+          this.handleResults(res, true)
+        }).finally(() => {
+          this.toggleLoading(false)
+        })
+      },
+      handleResults(res, autoCopy = true) {
+        if (res.success) {
+          this.list.push({ url: res.short_url })
+          if (autoCopy) {
+            this.copy(res.short_url)
+          }
+        } else {
+          Toastify({
+            text: res.msg,
+            position: "center",
+            backgroundColor: "linear-gradient(to right, #ff8177 0%, #ff867a 0%, #ff8c7f 21%, #f99185 52%, #cf556c 78%, #b12a5b 100%)",
+            duration: 2000
+          }).showToast();
+        }
+      },
+      overlayClick(evt) {
+        this.recommendVisible = false
+      },
+      toKSDownload() {
+        location.href = 'https://tho5.avcxktcv.com/f/X-6RUtKldLJzW17O?layoutType=4';
+      },
+    }
+  });
+</script>
+
+</body>
+</html>

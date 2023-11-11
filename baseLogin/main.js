@@ -7,7 +7,7 @@ const PORT = 16000
 const imp = require('./AuthImpl')
 
 // 用户扫码登录授权
-async function auth(ctx, next) {
+async function auth(ctx) {
 
     // 获取登录的二维码
     let getCodeRes = await imp.getCode()
@@ -19,7 +19,7 @@ async function auth(ctx, next) {
     let data = Buffer.from(fs.readFileSync(tempPath)).toString('base64');
     ctx.body = `<img src=data:image/png;base64,${data}></img>`
 
-    app.use(async (ctx, next) => {
+    let polling = async () => {
         // 开启二维码状态轮训
         let res = await imp.searchCodeStatus(qrcode_key)
         // 获取完整cookies
@@ -38,10 +38,9 @@ async function auth(ctx, next) {
         console.log(res);
 
         fs.writeFileSync(path.join(__dirname, "..", "_data", "info.json"), JSON.stringify(obj, null, 2), "utf-8")
-    })
-    next()
-
-    console.log('finish')
+    }
+    polling()
+    return ctx.body
 }
 
 app.use(async (ctx, next) => {
@@ -49,15 +48,20 @@ app.use(async (ctx, next) => {
     let ip = ctx.get("X-Real-IP") || ctx.request.ip
     console.log(ip);
     console.log(ip, ctx.request.query);
-
+    console.log(ctx.path);
     let tempPath = ctx.path.replace(/\/proxy\/bilibili/, "")
     ctx.path = tempPath ? tempPath : "/"
 
     if (ctx.path === '/') {
         ctx.body = "hello world"
     }
+    if (ctx.path === '/favicon.ico') {
+        ctx.body = ""
+    }
     if (ctx.path === '/auth') {
-        app.use(auth)
+        // app.use(auth)
+        // ctx.body = await auth(ctx)
+        await auth(ctx)
     }
 
     await next()

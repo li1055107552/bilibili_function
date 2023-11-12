@@ -18,30 +18,30 @@ module.exports = {
                     },
                     responseType: "stream"
                 })
-            
+
                 const writer = fs.createWriteStream(path.join(saveDir, filename))
-            
+
                 let r = file.data
                 r.pipe(writer)
-        
+
                 writer.on('finish', () => {
                     writer.end(() => {
                         resolve(filename)
                     })
                 })
-        
+
                 writer.on('error', (err) => {
                     console.log(err)
                     reject(`${filename} download failed`)
                 })
-        
+
             } catch (error) {
                 console.log(`download error: `, error);
                 reject(error)
-            }    
-    
+            }
+
         })
-    
+
     },
 
     // 获取网页内容 并做嗅探
@@ -102,10 +102,25 @@ module.exports = {
     },
 
     Media: class Media {
-        constructor(data){
-            this.data = data
+        constructor(data) {
+            this._rawdata = data
             console.log(data);
-            fs.writeFileSync('./data', JSON.stringify(data, null, 4), "utf-8")
+            // fs.writeFileSync('./mdia/data.json', JSON.stringify(data, null, 4), "utf-8")
+            this.audio = data.dash.audio
+            this.video = data.dash.video
+            this.support_formats = data.support_formats
+            this.timelength = data.timelength
+            this.video_codecid = data.video_codecid
+
+            accept_quality.forEach(id => this.data = { id })
+
+            data.support_formats.forEach(obj => 
+                this.data[obj.quality].description = obj.new_description
+            );
+
+
+            
+
             console.log('finish')
         }
     }

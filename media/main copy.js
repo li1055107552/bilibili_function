@@ -35,7 +35,6 @@ async function main() {
     // 获取网页内容 并做嗅探
     let [data, title] = [...await impl.getData(bvUrl, info.getAllCookie())]
 
-    console.log(title);
 
     // 排序formats/audioArr/videoArr
     // 该用户支持的音视频格式

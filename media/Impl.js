@@ -99,7 +99,15 @@ module.exports = {
             })
         })
 
-    }
+    },
 
+    Media: class Media {
+        constructor(data){
+            this.data = data
+            console.log(data);
+            fs.writeFileSync('./data', JSON.stringify(data, null, 4), "utf-8")
+            console.log('finish')
+        }
+    }
 
 }

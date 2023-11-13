@@ -36,7 +36,8 @@ async function main() {
     let [data, title] = [...await impl.getData(bvUrl, info.getAllCookie())]
 
     console.log(title);
-    let media = new impl.Media(data)
+    // let media = new impl.Media(data, bv)
+    let media = await impl.Media.init(data, bv)
     console.log(media);
 
     return null

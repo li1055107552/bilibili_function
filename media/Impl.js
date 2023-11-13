@@ -5,7 +5,7 @@ const axios = require('axios');
 const jsdom = require('jsdom')
 const JSDOM = jsdom.JSDOM
 
-module.exports = {
+let that = {
 
     download: async function (buUrl, url, saveDir = __dirname, name = "") {
 
@@ -83,7 +83,7 @@ module.exports = {
 
     // 获取文件大小
     len: function (fileUrl, bvUrl) {
-        console.log(fileUrl, bvUrl);
+        // console.log(fileUrl, bvUrl);
         return new Promise((resolve, reject) => {
             axios.get(fileUrl, {
                 headers: {
@@ -103,26 +103,59 @@ module.exports = {
 
     Media: class Media {
         constructor(data) {
+            console.log(this);
+            this.data = data
+            // this = data
+            // this.data = {}
+            // this._rawdata = data
+            // console.log(data);
+            // // fs.writeFileSync('./mdia/data.json', JSON.stringify(data, null, 4), "utf-8")
+            // this.bv = bv
+        }
+
+        static async init(data, bv){
+            this.data = {}
             this._rawdata = data
             console.log(data);
             // fs.writeFileSync('./mdia/data.json', JSON.stringify(data, null, 4), "utf-8")
+            this.bv = bv
+            this.bvUrl = "https://www.bilibili.com/video/" + bv
             this.audio = data.dash.audio
             this.video = data.dash.video
             this.support_formats = data.support_formats
+            this.accept_quality = data.accept_quality // = Object.keys(this.data)
             this.timelength = data.timelength
             this.video_codecid = data.video_codecid
 
-            accept_quality.forEach(id => this.data = { id })
-
-            data.support_formats.forEach(obj => 
+            // 初始化this.data
+            data.accept_quality.forEach(id => this.data[id] = {})
+            // 添加描述
+            data.support_formats.forEach(obj =>
                 this.data[obj.quality].description = obj.new_description
             );
+            for (let i = 10; i < data.dash.video.length; i++) {
+                const obj = data.dash.video[i];
 
+                this.data[obj.id].video || (this.data[obj.id].video = [])
+                this.data[obj.id].video.push({
+                    bandwidth: obj.bandwidth,
+                    baseUrl: obj.baseUrl,
+                    // backupUrl: obj.backupUrl,
+                    // codecid: obj.codecid,
+                    // codecs: obj.codecs,
+                    frameRate: obj.frameRate,
+                    size: await that.len(obj.baseUrl, this.bvUrl)
+                })
+            }
 
-            
-
+            console.log(this.data);
             console.log('finish')
+
+            return new Media(this)
         }
+
     }
 
 }
+
+module.exports = that

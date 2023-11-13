@@ -60,14 +60,11 @@ async function main() {
     console.log('finish')
 }
 
-main()
+// main()
 async function test(){
 
-    let info = new Info(__dirname)
-    
-    let check = await RefreshImpl.checkrefresh(info.getAllCookie())
-    console.log(isrefresh = check.data.refresh);
-
+    let t = new testClass()
+    console.log(t);
     console.log('finish')
 }
-// test()
+test()

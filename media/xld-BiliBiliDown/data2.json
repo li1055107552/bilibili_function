@@ -1,0 +1,51 @@
+{
+    "16": {
+        "description": "360P 流畅",
+        "video": [
+            {
+                "bandwidth": 195063,
+                "baseUrl": "",
+                "frameRate": "30.303",
+                "size": "3.53MB"
+            },
+            {
+                "bandwidth": 288388,
+                "baseUrl": "",
+                "frameRate": "30.303",
+                "size": "5.21MB"
+            },
+            {
+                "bandwidth": 208410,
+                "baseUrl": "",
+                "frameRate": "30.019",
+                "size": "3.81MB"
+            }
+        ]
+    },
+    "32": {
+        "description": "480P 清晰",
+        "video": [
+            {
+                "bandwidth": 515776,
+                "baseUrl": "",
+                "frameRate": "30.303",
+                "size": "9.32MB"
+            },
+            {
+                "bandwidth": 309005,
+                "baseUrl": "",
+                "frameRate": "30.019",
+                "size": "5.62MB"
+            }
+        ]
+    },
+    "64": {
+        "description": "720P 高清"
+    },
+    "80": {
+        "description": "1080P 高清"
+    },
+    "116": {
+        "description": "1080P 60帧"
+    }
+}

@@ -4,14 +4,31 @@ const RefreshImpl = require('./baseLogin/RefreshImpl')
 const fs = require('fs')
 
 class testClass{
-    constructor(){
-        this.data = "this is testClass data"
+    constructor(data){
+        console.log("constructor");
+        this.data = data
     }
     fn1(){
         return "this is testClass.fn1"
     }
     fn2(){
         return "this is testClass.fn2"
+    }
+
+    static init1(msg = "this is testClass data"){
+        // console.log(this);
+        this.data = msg
+        return new this
+    }
+    static init2(msg = "this is testClass data"){
+        // console.log(this);
+        this.data = msg
+        return new testClass(this.data)
+    }
+    static init3(msg = "this is testClass data"){
+        // console.log(this);
+        this.data = msg
+        return this
     }
 }
 
@@ -65,6 +82,15 @@ async function test(){
 
     let t = new testClass()
     console.log(t);
+
+    let init1 = testClass.init1()
+    console.log(init1);
+
+    let init2 = testClass.init2()
+    console.log(init2);
+
+    let init3 = testClass.init3()
+    console.log(init3);
     console.log('finish')
 }
 test()

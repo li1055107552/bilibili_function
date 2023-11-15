@@ -5,6 +5,51 @@ const axios = require('axios');
 const jsdom = require('jsdom')
 const JSDOM = jsdom.JSDOM
 
+class videoCodecid{
+    constructor(){
+
+    }
+
+    static 7(){
+        return {
+            desc: "AVC 编码",
+            remark: "8K 视频不支持该格式"
+        }
+    }
+    static 12(){
+        return {
+            desc: "HEVC 编码",
+            remark: ""
+        } 
+    }
+    static 13(){
+        return {
+            desc: "AV1 编码",
+            remark: ""
+        } 
+    }
+}
+
+class audio{
+    constructor(){
+
+    }
+    static id(key){
+        let keys = {
+            30216: "64K",
+            30232: "132K",
+            30280: "192K",
+            30250: "杜比全景声",
+            30251: "Hi-Res无损"
+        }
+        return {
+            msg: keys[key],
+            desc: "音视频清晰度代码"
+        }
+    }
+}
+
+
 let that = {
 
     download: async function (buUrl, url, saveDir = __dirname, name = "") {
@@ -167,42 +212,14 @@ let that = {
                     here.data[obj.id].video.push({
                         bandwidth: obj.bandwidth,
                         baseUrl: obj.baseUrl,
-                        // backupUrl: obj.backupUrl,
-                        // codecid: obj.codecid,
-                        // codecs: obj.codecs,
+                        backupUrl: obj.backupUrl,
+                        codecid: obj.codecid,
+                        codecs: obj.codecs,
                         frameRate: obj.frameRate,
                         size: res[i]
                     })
                 }
-                // res.forEach((size, index, lenArr) => {
-                //     const obj = data.dash.video[index];
-                //     here.data[obj.id].video || (here.data[obj.id].video = [])
-                //     here.data[obj.id].video.push({
-                //         bandwidth: obj.bandwidth,
-                //         baseUrl: obj.baseUrl,
-                //         // backupUrl: obj.backupUrl,
-                //         // codecid: obj.codecid,
-                //         // codecs: obj.codecs,
-                //         frameRate: obj.frameRate,
-                //         size: size
-                //     })
-                // });
             })
-
-            // for (let i = 10; i < data.dash.video.length; i++) {
-            //     const obj = data.dash.video[i];
-
-            //     this.data[obj.id].video || (this.data[obj.id].video = [])
-            //     this.data[obj.id].video.push({
-            //         bandwidth: obj.bandwidth,
-            //         baseUrl: obj.baseUrl,
-            //         // backupUrl: obj.backupUrl,
-            //         // codecid: obj.codecid,
-            //         // codecs: obj.codecs,
-            //         frameRate: obj.frameRate,
-            //         size: await that.len(obj.baseUrl, this.bvUrl)
-            //     })
-            // }
 
             console.log(this.data);
             console.log('finish')

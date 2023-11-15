@@ -1,7 +1,7 @@
 const fs = require('fs')
 
 const path = require('path')
-const rootPath = path.join(__dirname, "..")
+const rootPath = path.join(__dirname, "..", "..")
 const Info = require(path.join(rootPath, "utils", "info"))
 const info = new Info(rootPath)
 

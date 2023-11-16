@@ -76,11 +76,15 @@ class mp4 {
 }
 
 class audio {
+    constructor(data){
 
+    }
 }
 
 class video {
-
+    constructor(data){
+        
+    }
 }
 
 let dashData = {

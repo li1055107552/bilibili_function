@@ -9,14 +9,7 @@ module.exports = {
     getCode: async function () {
         let config = {
             method: 'get',
-            url: 'https://passport.bilibili.com/x/passport-login/web/qrcode/generate',
-            // headers: {
-            //     'User-Agent': 'Apifox/1.0.0 (https://apifox.com)',
-            //     'Accept': '*/*',
-            //     'Host': 'passport.bilibili.com',
-            //     'Connection': 'keep-alive',
-            //     'Cookie': 'SESSDATA=160bf08e%2C1714885221%2C6123d%2Ab1CjAUu8QRcCeuFEfzrBBAL80t0FI-3wlh3Em9zDlSlvOnS4OnUlglCxUI2Qn_HD4dsEQSVnc5M2kydjNkT18wZVRCYkxvZUZUbmdLQi1mdnRpc1BqN3BpeUo5LUJFa09MVTMyQl8xcUlzY01fY2xEbDRqZ2pjYm9jLVY0akhacUE1RnNFb1BLWHRRIIEC; bili_jct=e841748cadf77a199a0bdd275a2445e8; DedeUserID=279753317; DedeUserID__ckMd5=11bbb73ea3f37ba1; sid=7kw58who'
-            // }
+            url: 'https://passport.bilibili.com/x/passport-login/web/qrcode/generate'
         };
         return new Promise((resolve, reject) => {
             axios(config).then(function (res) {
@@ -31,10 +24,25 @@ module.exports = {
 
     // 将二维码转为图片，然后APP扫码
     code2pic: async function (str, path = "tempQRcodePic.png") {
+        
+        // 直接本地返回
+        // let code = qr.image(str, { type: 'png', size: 10 });
+        // let pic = code.pipe(fs.createWriteStream(path.join(path.resolve(__dirname), path)));
+
+        // pic.on('error', () => {
+        //     console.log('二维码生成失败');
+        //     resolve("二维码生成失败")
+        // })
+        // pic.on('finish', () => {
+        //     console.log('二维码生成完毕');
+        //     resolve(fs.readFileSync(path.join(path.resolve(__dirname), path)))
+        // })
+
+        // 自己部署了服务后进行请求，详情可以看 README.md
         str = encodeURIComponent(str)
         let config = {
             method: 'get',
-            url: `https://tenyding.cn/proxy/QRcode/?type=file&str=${str}`,
+            url: `https://127.0.0.1:9999/?type=file&str=${str}`,
             responseType: 'stream'
         };
 

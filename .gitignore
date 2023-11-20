@@ -3,6 +3,7 @@ _data/*
 live/log
 media/*.mp4
 */data.json
+*.json
 
 # Logs
 logs

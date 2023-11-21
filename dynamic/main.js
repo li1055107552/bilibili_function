@@ -7,7 +7,8 @@ const info = new Info(rootPath)
 const impl = require('./Impl')
 
 async function main(){
-
+    console.log(info.getAllCookie()); 
+    return null
     let res = await impl.getSpaceDynamic(info.getAllCookie(), 8366990)
     console.log(res);
     const _rawData = res.data

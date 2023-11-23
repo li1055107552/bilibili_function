@@ -123,6 +123,27 @@ async function getDash(bv) {
 
 }
 
+async function download(url, savefilepath) {
+    return new Promise((resolve, reject) => {
+        axios({
+            method: 'get',
+            url: url,
+            responseType: 'stream'
+        }).then(response => {
+            // 将响应流直接写入文件
+            response.data.pipe(fs.createWriteStream(savefilepath));
+
+            // 监听完成事件
+            response.data.on('end', () => {
+                resolve('finish')
+            });
+        }).catch(error => {
+            console.error('下载文件时发生错误:', error.message);
+        });
+    })
+
+}
+
 async function main() {
 
     let res = await impl.getAllDynamic(info.getAllCookie(), 44648324)   // 677378178
@@ -167,13 +188,14 @@ async function main() {
         // 获取dash列表
         let dash = await getDash(bv)
         // 下载相应品质的音频/视频
-        await download(mp4url)
-        await download(dash.audioURL)
-        await download(dash.videoRUL)
+        await download(mp4url, path.join(__dirname, "download", `${bv}.mp4`))
+        await download(dash.audioURL, path.join(__dirname, "download", `${bv}-audio.mp4`))
+        await download(dash.videoRUL, path.join(__dirname, "download", `${bv}-vedio.mp4`))
         // 合成音视频
-        merge()
+        merge(path.join(__dirname, "download", `${bv}-audio.mp4`), path.join(__dirname, "download", `${bv}-vedio.mp4`), path.join(__dirname, "download", `${bv}-merge.mp4`))
+
         // 上传
-        upload()
+        upload(path.join(__dirname, "download", `${bv}-merge.mp4`))
     }
 
 

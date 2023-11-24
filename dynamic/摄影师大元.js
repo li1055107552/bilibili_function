@@ -144,6 +144,10 @@ async function download(url, savefilepath) {
 
 }
 
+async function merge(audio, vedio, output){
+    
+}
+
 async function main() {
 
     let res = await impl.getAllDynamic(info.getAllCookie(), 44648324)   // 677378178

@@ -175,6 +175,20 @@ async function merge(audio, vedio, output) {
 
 }
 
+async function upload(merge_savePath, uploadPath = "摄影师大元", filename = ""){
+    const UploadTask = require('baiduNetDisk/handle')
+    let uploadTask = new UploadTask("your_baiduNetDisk_username")
+    console.log(uploadTask)
+    if (uploadTask.auth("your_baiduNetDisk_username")) {
+        const filePath = merge_savePath
+        let name = filename == "" ? path.basename(filePath) : filename
+        let res = await uploadTask.create(filePath, `/_upload/${uploadPath}/${name}`)
+        console.log(res);
+        return res
+        console.log('finish')
+    }
+}
+
 async function main() {
 
     // let res = await impl.getAllDynamic(info.getAllCookie(), 44648324)   // 677378178
@@ -226,16 +240,21 @@ async function main() {
         console.log(dash.audioURL);
         console.log(dash.videoRUL);
 
+        let mp4_savePath = path.join(__dirname, "download", `${bv}.mp4`)
+        let audio_savePath = path.join(__dirname, "download", `${bv}-audio.mp4`)
+        let video_savePath = path.join(__dirname, "download", `${bv}-video.mp4`)
+        let merge_savePath = path.join(__dirname, "download", `${bv}-merge.mp4`)
+
         // 下载相应品质的音频/视频
-        await download(mp4url, path.join(__dirname, "download", `${bv}.mp4`))
-        await download(dash.audioURL, path.join(__dirname, "download", `${bv}-audio.mp4`))
-        await download(dash.videoRUL, path.join(__dirname, "download", `${bv}-vedio.mp4`))
+        await download(mp4url, mp4_savePath)
+        await download(dash.audioURL, audio_savePath)
+        await download(dash.videoRUL, video_savePath)
 
         // 合成音视频
-        merge(path.join(__dirname, "download", `${bv}-audio.mp4`), path.join(__dirname, "download", `${bv}-vedio.mp4`), path.join(__dirname, "download", `${bv}-merge.mp4`))
+        await merge(audio_savePath, video_savePath, merge_savePath)
 
         // 上传
-        // upload(path.join(__dirname, "download", `${bv}-merge.mp4`))
+        await upload(merge_savePath)
     }
 
 
@@ -250,7 +269,9 @@ async function test() {
     // console.log(res);
     // console.log('finish')
     // let res = await impl.getSpace(info.getAllCookie(), 44648324)
-    let res = await impl.getAllDynamic(info.getAllCookie(), 44648324)
+    // let res = await impl.getAllDynamic(info.getAllCookie(), 44648324)
+    let merge_savePath = path.join(__dirname, "download", `BV1PC4y1P7qv.mp4`)
+    let res = await upload(merge_savePath)
     console.log(res);
     console.log('finish')
 

@@ -1,5 +1,7 @@
 const fs = require('fs')
 const path = require('path')
+const ffmpeg = require("fluent-ffmpeg");
+const axios = require('axios')
 const rootPath = path.join(__dirname, "..")
 const Info = require(path.join(rootPath, "utils", "info"))
 const info = new Info(rootPath)
@@ -10,7 +12,7 @@ let temp = {}
 
 function isNeedDownload(bv, qn) {
     if (Object.keys(temp).length == 0) {
-        temp = JSON.parse(fs.readFileSync("./摄影师大元.json", "utf-8") || "{}")
+        temp = JSON.parse(fs.readFileSync(path.join(__dirname, "摄影师大元.json"), "utf-8") || "{}")
     }
     return !Object.prototype.hasOwnProperty.call(temp, bv)
 }
@@ -21,7 +23,7 @@ async function getCid(bv) {
         url: `https://api.bilibili.com/x/player/pagelist?bvid=${bv}`
     };
     let response = await axios(config)
-    return response.data.data.cid
+    return response.data.data[0].cid
 }
 
 async function getMP4Url(cookies, bv, cid, qn = "64") {
@@ -51,7 +53,7 @@ async function getMP4Url(cookies, bv, cid, qn = "64") {
             return await getMP4Url(cookies, bv, cid, accept_quality[i])
 
         if (accept_quality[i] == quality)
-            return res.data.durl.url
+            return res.data.durl[0].url
     }
 
     return res.data.durl.url
@@ -124,6 +126,10 @@ async function getDash(bv) {
 }
 
 async function download(url, savefilepath) {
+    
+    // 创建文件夹
+    fs.mkdirSync(path.dirname(savefilepath), { recursive: true });
+
     return new Promise((resolve, reject) => {
         axios({
             method: 'get',
@@ -144,13 +150,36 @@ async function download(url, savefilepath) {
 
 }
 
-async function merge(audio, vedio, output){
-    
+async function merge(audio, vedio, output) {
+    let start = new Date().getTime()
+    return new Promise((resolve, reject) => {
+        ffmpeg({ '-hwaccel': 'cuvid' })
+        .addInput(audio)
+        .addInput(vedio)
+        // .addOutputOptions([
+        //     '-profile:v high',
+        //     '-qp 28',
+        //     '-c:v h264_nvenc'
+        // ])
+        .output(output)
+        .on('progress', (progress) => { // 监听切片进度
+            console.log('Processing: ' + progress.percent + '% done');
+        })
+        .on('end', () => { // 监听结束
+            console.log("视频切片完成");
+            console.log("用时：", Date.now() - start)
+            resolve("finish")
+        })
+        .run(); // 执行
+    })
+
 }
 
 async function main() {
 
-    let res = await impl.getAllDynamic(info.getAllCookie(), 44648324)   // 677378178
+    // let res = await impl.getAllDynamic(info.getAllCookie(), 44648324)   // 677378178
+    let res = await impl.getSpaceDynamic(info.getAllCookie(), 44648324)   // 677378178
+    res = res.data.items
     res = res.filter(e => e.type == "DYNAMIC_TYPE_AV")
     let list = []
 
@@ -182,24 +211,31 @@ async function main() {
 
     console.log(list);
 
-
+    let item = list[0]
+    let bv = item.dynamic.archive.bvid
     // 判断视频是否需要下载
-    if (isNeedDownload(item.dynamic.archive.bvid)) {
+    if (isNeedDownload(bv)) {
         // 获取cid
-        let cid = await getCid()
+        let cid = await getCid(bv)
         // 获取MP4列表
-        let mp4url = await getMP4Url(cookies, bv, cid)
+        let mp4url = await getMP4Url(info.getAllCookie(), bv, cid)
         // 获取dash列表
         let dash = await getDash(bv)
+
+        console.log(mp4url);
+        console.log(dash.audioURL);
+        console.log(dash.videoRUL);
+
         // 下载相应品质的音频/视频
         await download(mp4url, path.join(__dirname, "download", `${bv}.mp4`))
         await download(dash.audioURL, path.join(__dirname, "download", `${bv}-audio.mp4`))
         await download(dash.videoRUL, path.join(__dirname, "download", `${bv}-vedio.mp4`))
+
         // 合成音视频
         merge(path.join(__dirname, "download", `${bv}-audio.mp4`), path.join(__dirname, "download", `${bv}-vedio.mp4`), path.join(__dirname, "download", `${bv}-merge.mp4`))
 
         // 上传
-        upload(path.join(__dirname, "download", `${bv}-merge.mp4`))
+        // upload(path.join(__dirname, "download", `${bv}-merge.mp4`))
     }
 
 

@@ -4,6 +4,7 @@ live/log
 media/*.mp4
 */data.json
 *.json
+*.mp4
 
 # Logs
 logs

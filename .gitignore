@@ -1,10 +1,10 @@
 # data
 _data/*
 live/log
-media/*.mp4
 */data.json
 *.json
 *.mp4
+dynamic/摄影师大元.js
 
 # Logs
 logs

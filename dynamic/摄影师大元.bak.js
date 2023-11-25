@@ -176,10 +176,10 @@ async function merge(audio, vedio, output) {
 }
 
 async function upload(merge_savePath, uploadPath = "摄影师大元", filename = ""){
-    const UploadTask = require('E:/_Project/百度云盘上下传/handle')
-    let uploadTask = new UploadTask("li1055107552")
+    const UploadTask = require('baiduNetDisk/handle')
+    let uploadTask = new UploadTask("your_baiduNetDisk_username")
     console.log(uploadTask)
-    if (uploadTask.auth("li1055107552")) {
+    if (uploadTask.auth("your_baiduNetDisk_username")) {
         const filePath = merge_savePath
         let name = filename == "" ? path.basename(filePath) : filename
         let res = await uploadTask.create(filePath, `/_upload/${uploadPath}/${name}`)

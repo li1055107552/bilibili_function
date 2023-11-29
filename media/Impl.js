@@ -88,9 +88,11 @@ module.exports = {
             axios.get(fileUrl, {
                 headers: {
                     'Referer': bvUrl,
+                    'Range': 'bytes=0-0'
                 }
             }).then(res => {
-                let dataLength = res.headers['content-length']
+                // let dataLength = res.headers['content-length']
+                let dataLength = res.headers['content-range'].replace("bytes 0-0/","")
                 resolve((dataLength / 1024 / 1024).toFixed(2) + "MB")
             }).catch(err => {
                 console.log(err);

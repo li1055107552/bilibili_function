@@ -40,7 +40,7 @@ async function main() {
     // 该用户支持的音视频格式
     let support_formats = data.support_formats
     // 音频资源数组
-    let audioArr = data.dash.audio
+    let audioArr = [...data.dash.audio]
     // 视频资源数组
     let videoArr = data.dash.video
 
@@ -55,7 +55,8 @@ async function main() {
             baseURL: element.baseUrl,
             bandwidth: element.bandwidth,
             size: await impl.len(element.baseUrl, bvUrl),
-            type: element.mimeType
+            type: element.mimeType,
+            codecs: element.codecs
         }
     }
 
@@ -111,8 +112,9 @@ async function main() {
             bandwidth: element.bandwidth,
             baseURL: element.baseUrl,
             frameRate: element.frameRate,
-            height: element.height,
             size: await impl.len(element.baseUrl, bvUrl),
+            codecid: element.codecid,
+            codecs: element.codecs
         }
         obj[element.id] ? obj[element.id].push(e) : obj[element.id] = [e]
     }

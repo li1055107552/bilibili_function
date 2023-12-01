@@ -19,7 +19,10 @@ module.exports = {
                 'Cookie': cookie
             }
         })
-        return res.data
+        if(res.data.code != 0){
+            Promise.resolve(res.data.message)
+        }
+        return res.data.data.refresh
     },
 
     /**
@@ -149,16 +152,22 @@ module.exports = {
 
 
         // 生成CorrespondPath
-        let correspondPath = await RefreshImpl.getCorrespondPath()
+        let correspondPath = await this.getCorrespondPath()
 
+        console.log(cookies);
+        console.log(correspondPath);
+        debugger
         // 获取refresh_csrf
-        let refresh_csrf = await RefreshImpl.getRefresh_csrf(cookies, correspondPath)
+        let refresh_csrf = await this.getRefresh_csrf(cookies, correspondPath)
+
+
+
         refresh_csrf = refresh_csrf.match(/(?<=<div id="1-name">).*?(?=<\/div>)/g)
 
 
         // 刷新Cookie
         let refresh_token_old = info.getInfo("refresh_token")
-        let refreshCookie = await RefreshImpl.refreshCookie(cookies, info.getCookie("bili_jct"), refresh_csrf, refresh_token_old)
+        let refreshCookie = await this.refreshCookie(cookies, info.getCookie("bili_jct"), refresh_csrf, refresh_token_old)
 
         // console.log(refreshCookie);
 
@@ -173,7 +182,7 @@ module.exports = {
         }
 
         // 确认刷新，废弃旧的
-        await RefreshImpl.confirmRefresh(info.getAllCookie(), info.getCookie("bili_jct"), refresh_token_old)
+        await this.confirmRefresh(info.getAllCookie(), info.getCookie("bili_jct"), refresh_token_old)
 
         console.log('refresh finish')
         return new Info(rootPath)

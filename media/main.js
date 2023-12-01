@@ -28,7 +28,7 @@ async function main() {
     // 1. 短链接
     // 2. 完整链接
     // 3. 终端输入
-    let bv = 'BV1Uw411p7ij' // 'BV1nw411x7DK' // await getBV()
+    let bv = 'BV1Zj411E75P' // 'BV1nw411x7DK' // await getBV()
     let bvUrl = "https://www.bilibili.com/video/" + bv
 
 
@@ -144,7 +144,7 @@ async function main() {
     // 把视频资源列表中的最后一个作为视频的URL(大会员的话, 一般为1080p/4k?)
     let videoRUL = urlList[urlList.length - 1].baseURL
 
-
+    // return null
     // 下载视频/音频
     try {
         console.log("正在下载音频文件：audio.mp4")

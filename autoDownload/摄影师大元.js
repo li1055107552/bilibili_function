@@ -9,10 +9,10 @@ let info = new Info(rootPath)
 const DynamicImpl = require(path.join(rootPath, "dynamic", 'Impl'))
 const RefreshImpl = require(path.join(rootPath, "baseLogin", "RefreshImpl"))
 
-function init(){
+function init() {
     let dataPath = path.join(__dirname, "data.json")
     if (!fs.existsSync(dataPath)) {
-        fs.writeFile(dataPath, JSON.stringify({}, null, 2), "utf-8", () => { })
+        fs.writeFile(dataPath, JSON.stringify({downloaded: []}, null, 2), "utf-8", () => { })
         return {
             downloaded: []
         }
@@ -105,7 +105,7 @@ async function getDash(bv) {
 
 }
 
-async function download(url, savefilepath) {
+async function download(bv, url, savefilepath) {
 
     // 创建文件夹
     fs.mkdirSync(path.dirname(savefilepath), { recursive: true });
@@ -115,7 +115,10 @@ async function download(url, savefilepath) {
         axios({
             method: 'get',
             url: url,
-            responseType: 'stream'
+            responseType: 'stream',
+            headers: {
+                'Referer': `https://www.bilibili.com/video/${bv}/`
+            }
         }).then(response => {
             // 将响应流直接写入文件
             response.data.pipe(fs.createWriteStream(savefilepath));
@@ -194,7 +197,7 @@ async function main() {
         info = await RefreshImpl.handle.call(RefreshImpl, rootPath)
     }
 
-    let action = Object.keys(history).length === 0 ? "getAllDynamic" : "getSpaceDynamic"
+    let action = Object.keys(history.downloaded).length === 0 ? "getAllDynamic" : "getSpaceDynamic"
     console.log("action:", action);
     let res = await DynamicImpl[action].call(DynamicImpl, info.getAllCookie(), 44648324)
 
@@ -265,11 +268,11 @@ async function main() {
 
                 // 下载相应品质的音频/视频
                 console.log("download: ", audio_savePath);
-                await download(dash.audioURL, audio_savePath)
+                await download(bv, dash.audioURL, audio_savePath)
                 console.log("download finish: ", audio_savePath);
 
                 console.log("download: ", video_savePath);
-                await download(dash.videoRUL, video_savePath)
+                await download(bv, dash.videoRUL, video_savePath)
                 console.log("download finish: ", video_savePath);
 
                 // 合成音视频
@@ -324,15 +327,61 @@ async function main() {
 main()
 
 async function test() {
-    // let res = await getDynamicAllVideo()
-    // console.log(res);
-    // console.log('finish')
-    // let res = await impl.getSpace(info.getAllCookie(), 44648324)
-    // let res = await impl.getAllDynamic(info.getAllCookie(), 44648324)
-    let merge_savePath = path.join(__dirname, "download", `BV1PC4y1P7qv.mp4`)
-    let res = await upload(merge_savePath)
-    console.log(res);
-    console.log('finish')
+    let bv = 'BV1cx411W7mZ'
+    try {
+
+        // 获取dash列表
+        console.log("getDash: ", bv);
+        let dash = await getDash(bv)
+
+        // let title = sanitizeFolderName(task.dynamic.archive.title)
+        let title = "腾讯竟然在成都办了个漫展"
+
+        let audio_savePath = path.join(__dirname, "download", `${bv}-audio.mp4`)
+        let video_savePath = path.join(__dirname, "download", `${bv}-video.mp4`)
+        let merge_savePath = path.join(__dirname, "download", `${bv}-${title}.mp4`)
+
+        // 下载相应品质的音频/视频
+        console.log("download: ", audio_savePath);
+        await download(bv, dash.audioURL, audio_savePath)
+        console.log("download finish: ", audio_savePath);
+
+        console.log("download: ", video_savePath);
+        await download(bv, dash.videoRUL, video_savePath)
+        console.log("download finish: ", video_savePath);
+
+        // 合成音视频
+        console.log("merge: ", audio_savePath, video_savePath);
+        await merge(audio_savePath, video_savePath, merge_savePath)
+        console.log("merge success: ", merge_savePath);
+
+        // 合成后删除音频和视频
+        console.log("delect: ", audio_savePath);
+        fs.rmSync(audio_savePath)
+        console.log("delect success: ", audio_savePath);
+
+        console.log("delect: ", video_savePath);
+        fs.rmSync(video_savePath)
+        console.log("delect success: ", video_savePath);
+
+        // history.lastId = task.id
+        // if (history.downloaded === undefined)
+        //     history.downloaded = []
+        // history.downloaded.unshift({
+        //     id: task.id,
+        //     bv: bv,
+        //     pub_ts: task.author.pub_ts
+        // })
+        // uploadList.push(task)
+
+        // 上传
+        console.log("upload: ", merge_savePath);
+        await upload(merge_savePath)
+        console.log("upload success: ", merge_savePath);
+    } catch (error) {
+        console.log("粗绰啦~");
+        console.log(error);
+    }
 
 }
 // test()

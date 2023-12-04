@@ -26,7 +26,7 @@ console.log("history: ", history);
 function isNeedDownload(bv) {
     if (Object.keys(history).length !== 0 && history.downloaded !== undefined) {
         let downloaded = history.downloaded
-        const targetObject = downloaded.find(obj => obj[bv] === bv);
+        const targetObject = downloaded.find(obj => obj.bv === bv);
         return targetObject === undefined
     }
     return true

@@ -20,7 +20,7 @@ module.exports = {
             }
         })
         if(res.data.code != 0){
-            Promise.resolve(res.data.message)
+            return Promise.resolve(res.data.message)
         }
         return res.data.data.refresh
     },

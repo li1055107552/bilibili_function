@@ -28,7 +28,22 @@ async function main() {
 
 // main()
 async function test(){
-    let r = testClass.obj[7]
-    console.log(r);
+    function isNeedDownload(bv) {
+        history = {
+            downloaded: [
+                {bv: "123"},
+                {bv: "456"},
+                {bv: "789"},
+                {bv: "23r"},
+                {bv: "wef"},
+                {bv: "adaf12"},
+            ]
+        }
+        const targetObject = history.downloaded.find(obj => obj[bv] === bv);
+        return targetObject === undefined
+    }
+    let res = isNeedDownload("wef")
+    console.log(res);
+    console.log('finish')
 }
 test()

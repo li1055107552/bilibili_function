@@ -19,9 +19,10 @@ function init() {
     }
     return JSON.parse(fs.readFileSync(dataPath, "utf-8"))
 }
+console.log(new Date().toLocaleString())
 let history = init()
 
-console.log("history: ", history);
+// console.log("history: ", history);
 
 function isNeedDownload(bv) {
     if (Object.keys(history).length !== 0 && history.downloaded !== undefined) {

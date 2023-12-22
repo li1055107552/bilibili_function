@@ -4,24 +4,43 @@
 const axios = require('axios')
 
 async function handle(cookies) {
-    try {
 
-        let baseURL = "https://api.live.bilibili.com"
-        let url = '/xlive/app-ucenter/v1/fansMedal/panel'
-        let res = await axios({
+    function _request(pageIndex) {
+        return axios({
             method: 'get',
-            url: baseURL + url,
+            url: "https://api.live.bilibili.com/xlive/app-ucenter/v1/fansMedal/panel",
             headers: {
                 'Cookie': cookies
             },
             params: {
-                page: 1,
+                page: pageIndex,
                 page_size: 10
             }
+        }).then(response => {
+            return response.data
+        }).catch(err => {
+            return { err, msg: "_request error" }
         })
-        return res.data
+    }
+    
+    try {
+        let result = []
+        let pageIndex = 1
+        let res = await _request(pageIndex++)
+        result = result.concat(res.data.special_list)
+        result = result.concat(res.data.list)
+    
+        let has_more = res.data.page_info.has_more
+    
+        while(has_more){
+            let res = await _request(pageIndex++)
+            has_more = res.data.page_info.has_more
+            result = result.concat(res.data.list)
+        }
+        return await result
+
     } catch (error) {
-        console.log(`getFansMedal main error: ${error}`);
+        console.log(`getFansMedal handle error: ${error}`);
         return 
     }
 
@@ -30,20 +49,16 @@ async function handle(cookies) {
 async function getFansMedal(cookies) {
 
     try {
-        let response = await handle(cookies)
-        let data = response.data
-    
-        let list = data.list.concat(data.special_list)
-    
+        let list = await handle(cookies)
         let res = []
-    
+
         list.forEach(element => {
             res.push({
                 nick_name: element.anchor_info.nick_name,
                 room_id: element.room_info.room_id
             })
         });
-    
+
         return res
 
     } catch (error) {
